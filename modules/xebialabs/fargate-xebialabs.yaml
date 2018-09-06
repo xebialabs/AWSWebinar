@@ -1,0 +1,249 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Dominate your enterprise and your software delivery using XebiaLabs and AWS - CloudFormation template for XebiaLabs. This AWS CloudFormation
+  template will set up an AWS Fargate Cluster and deploy XL-Release and XL-Deploy as a container.
+Metadata:
+  LICENSE: |-
+    Copyright 2018 Amazon Web Services
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: AWS Fargate Configuration
+      Parameters:
+      - ClusterName
+    - Label:
+        default: XebiaLabs Configuration
+      Parameters:
+      - XLDPass
+      - XLRPass
+    ParameterLabels:
+      ClusterName:
+        default: Cluster
+      XLDPass:
+        default: XL-Deploy Password
+      XLRPass:
+        default: XL-Release Password
+Parameters:
+  ClusterName:
+    Description: Desired name for your cluster.
+    Type: String
+    Default: XebiaLabs
+  XLDPass:
+    Description: Desired password for XL-Deploy admin user.
+    Type: String
+    NoEcho: True
+  XLRPass:
+    Description: Desired password for XL-Release admin user.
+    Type: String
+    NoEcho: True
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.194.0.0/16
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId:
+        Ref: InternetGateway
+      VpcId:
+        Ref: VPC
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      AvailabilityZone:
+        Fn::Select:
+        - 0
+        - Fn::GetAZs: ''
+      CidrBlock: 10.194.1.0/24
+      MapPublicIpOnLaunch: true
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      AvailabilityZone:
+        Fn::Select:
+        - 1
+        - Fn::GetAZs: ''
+      CidrBlock: 10.194.2.0/24
+      MapPublicIpOnLaunch: true
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      SubnetId:
+        Ref: PublicSubnet1
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      SubnetId:
+        Ref: PublicSubnet2
+  FargateTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ecs-tasks.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  FargateLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+  XLDSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: XL-DeploySG
+      GroupDescription: Security Group for XL-Deploy on Fargate
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 4516
+        ToPort: 4516
+        CidrIp: 0.0.0.0/0
+      VpcId:
+        Ref: VPC
+  XLRSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: XL-ReleaseSG
+      GroupDescription: Security Group for XL-Release on Fargate
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 5516
+        ToPort: 5516
+        CidrIp: 0.0.0.0/0
+      VpcId:
+        Ref: VPC        
+  FargateCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName:
+        Ref: ClusterName
+  XLDService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: FargateCluster
+      ServiceName: xl-deploy
+      LaunchType: FARGATE
+      DesiredCount: 1
+      TaskDefinition:
+        Ref: XLDTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Ref: XLDSecurityGroup
+          Subnets:
+          - Ref: PublicSubnet1
+          - Ref: PublicSubnet2
+  XLDTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Cpu: 2048
+      Memory: 4096
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+      ExecutionRoleArn:
+        Fn::GetAtt: FargateTaskRole.Arn
+      ContainerDefinitions:
+      - Name: xl-deploy
+        Image: 
+          Fn::Sub: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/xl-deploy:latest
+        PortMappings:
+        - ContainerPort: 4516
+          Protocol: tcp
+        Environment:
+        - Name: ADMIN_PASSWORD
+          Value:
+            Ref: XLDPass
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: FargateLogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: xl-deploy
+  XLRService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: FargateCluster
+      ServiceName: xl-release
+      LaunchType: FARGATE
+      DesiredCount: 1
+      TaskDefinition:
+        Ref: XLRTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+          - Ref: XLRSecurityGroup
+          Subnets:
+          - Ref: PublicSubnet1
+          - Ref: PublicSubnet2
+  XLRTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Cpu: 2048
+      Memory: 4096
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+      - FARGATE
+      ExecutionRoleArn:
+        Fn::GetAtt: FargateTaskRole.Arn
+      ContainerDefinitions:
+      - Name: xl-release
+        Image: 
+          Fn::Sub: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/xl-release:latest
+        PortMappings:
+        - ContainerPort: 5516
+          Protocol: tcp
+        Environment:
+        - Name: ADMIN_PASSWORD
+          Value:
+            Ref: XLRPass
+        LogConfiguration:
+          LogDriver: awslogs
+          Options:
+            awslogs-group:
+              Ref: FargateLogGroup
+            awslogs-region:
+              Ref: AWS::Region
+            awslogs-stream-prefix: xl-release            
+...
