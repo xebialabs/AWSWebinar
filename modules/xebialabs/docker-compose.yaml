@@ -1,0 +1,18 @@
+version: '3.4'
+services:
+  xld:
+    image: xebialabs/xl-deploy:8.2
+    container_name: xld
+    ports:
+     - "4516:4516"
+    environment:
+     - ADMIN_PASSWORD=admin
+  xlr:
+    image: xebialabs/xl-release:8.2
+    container_name: xlr
+    ports:
+     - "5516:5516"
+    links:
+     - xld
+    environment:
+     - ADMIN_PASSWORD=admin     
