@@ -38,11 +38,7 @@ Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-<<<<<<< HEAD
       CidrBlock: 172.31.0.0/16
-=======
-      CidrBlock: 10.194.0.0/16
->>>>>>> 7b2f46ff2403c1a8c1c88b02861803df188ff84d
   InternetGateway:
     Type: AWS::EC2::InternetGateway
   InternetGatewayAttachment:
@@ -61,11 +57,7 @@ Resources:
         Fn::Select:
         - 0
         - Fn::GetAZs: ''
-<<<<<<< HEAD
       CidrBlock: 172.31.0.0/24
-=======
-      CidrBlock: 10.194.1.0/24
->>>>>>> 7b2f46ff2403c1a8c1c88b02861803df188ff84d
       MapPublicIpOnLaunch: true
   PublicSubnet2:
     Type: AWS::EC2::Subnet
@@ -76,11 +68,7 @@ Resources:
         Fn::Select:
         - 1
         - Fn::GetAZs: ''
-<<<<<<< HEAD
       CidrBlock: 172.31.1.0/24
-=======
-      CidrBlock: 10.194.2.0/24
->>>>>>> 7b2f46ff2403c1a8c1c88b02861803df188ff84d
       MapPublicIpOnLaunch: true
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
