@@ -16,24 +16,14 @@ Metadata:
         default: AWS Fargate Configuration
       Parameters:
       - ClusterName
-    - Label:
-        default: Jenkins Configuration
-      Parameters:
-      - JenkinsPW      
     ParameterLabels:
       ClusterName:
         default: Cluster
-      JenkinsPW:
-        default: Jenkins Password
 Parameters:
   ClusterName:
     Description: Desired name for your cluster.
     Type: String
-    Default: Jenkins
-  JenkinsPW:
-    Description: Desired password for Jenkins admin user.
-    Type: String
-    NoEcho: True    
+    Default: Jenkins 
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -168,10 +158,6 @@ Resources:
         PortMappings:
         - ContainerPort: 8080
           Protocol: tcp
-        Environment:
-        - Name: argumentsRealm.passwd.admin
-          Value:
-            Ref: JenkinsPW
         LogConfiguration:
           LogDriver: awslogs
           Options:
