@@ -1,0 +1,214 @@
+= XebiaLabs and AWS
+
+:imagesdir: ../../images
+
+== Getting Started
+
+****
+*Expected Outcome:*
+
+* Deploy Amazon Elastic Container Registry (ECR)
+
+*Requirements:*
+Completion of `./modules/getting-started` module.
+****
+
+== Introduction
+
+https://aws.amazon.com/ecr/[Amazon Elastic Container Registry (ECR)] is a fully-managed https://aws.amazon.com/docker/[Docker] container registry that makes it easy for developers to store, manage, and deploy Docker container images. 
+
+In this module, we will create three repositories in ECR using a https://aws.amazon.com/cloudformation/[CloudFormation] template. These repositories will be used to store docker images for https://jenkins.io/[Jenkins], https://xebialabs.com/products/xl-release/[XL-Release], and https://docs.xebialabs.com/xl-deploy/[XL-Deploy].
+
+Before we get started lets first change to the module directory.
+
+[source,shell]
+----
+cd ~/environment/AWSWebinar/modules/container-registry
+----
+
+===== Launch the Cloudformation template
+[source,shell]
+----
+aws cloudformation create-stack --stack-name "xebialabs-ecr" \
+  --template-body=file://ecr.yml
+----
+
+Wait for the CloudFormation template to successfully deploy.
+
+[source,shell]
+----
+until [[ `aws cloudformation describe-stacks --stack-name "xebialabs-ecr" --query "Stacks[0].[StackStatus]" --output text` == "CREATE_COMPLETE" ]]; do  echo "The stack is NOT in a state of CREATE_COMPLETE at `date`";   sleep 30; done && echo "The Stack is built at `date` - Please proceed"
+----
+
+===== Pull the latest https://hub.docker.com/r/xebialabs/xl-release/[Docker image for XL Release].
+[source,shell]
+----
+docker pull xebialabs/xl-release:8.2
+----
+
+===== Pull the latest https://hub.docker.com/r/xebialabs/xl-deploy/[Docker image for XL Deploy].
+[source,shell]
+----
+docker pull xebialabs/xl-deploy:8.2
+----
+
+===== Pull the latest https://hub.docker.com/r/jenkinsci/blueocean/[Docker image for Jenkins].
+[source,shell]
+----
+docker pull jenkinsci/blueocean
+----
+
+===== Pushing the XebiaLabs images to Amazon Elastic Container Registry (ECR)
+
+Before we can deploy our XL-Release and XL-Deploy to an orchestrator, we need to push our images ECR.
+
+Step 1:: Log into your Amazon ECR registry using the helper provided by the AWS CLI in the Cloud9 terminal:
++
+[source,shell]
+----
+eval $(aws ecr get-login --no-include-email)
+----
+Step 2:: Use the AWS CLI to get information about the Amazon ECR repositories that were created using the CloudFormation template. One repository will be for XL-Release, another for XL-Deploy, and the third for Jenkins.
++
+[source,shell]
+----
+aws ecr describe-repositories --repository-name xl-release
+----
++
+[.output]
+....
+{
+    "repositories": [
+        {
+            "registryId": "123456789012", 
+            "repositoryName": "xl-release", 
+            "repositoryArn": "arn:aws:ecr:us-west-2:123456789012:repository/xl-release", 
+            "createdAt": 1536268153.0, 
+            "repositoryUri": "123456789012.dkr.ecr.us-west-2.amazonaws.com/xl-release"
+        }
+    ]
+}
+....
++
+[source,shell]
+----
+aws ecr describe-repositories --repository-name xl-deploy
+----
++
+[.output]
+....
+{
+    "repositories": [
+        {
+            "registryId": "123456789012", 
+            "repositoryName": "xl-deploy", 
+            "repositoryArn": "arn:aws:ecr:us-west-2:123456789012:repository/xl-deploy", 
+            "createdAt": 1536268153.0, 
+            "repositoryUri": "123456789012.dkr.ecr.us-west-2.amazonaws.com/xl-deploy"
+        }
+    ]
+}
+....
++
+[source,shell]
+----
+aws ecr describe-repositories --repository-name jenkins
+----
++
+[.output]
+....
+{
+    "repositories": [
+        {
+            "registryId": "123456789012", 
+            "repositoryName": "jenkins", 
+            "repositoryArn": "arn:aws:ecr:us-west-2:123456789012:repository/jenkins", 
+            "createdAt": 1536268153.0, 
+            "repositoryUri": "123456789012.dkr.ecr.us-west-2.amazonaws.com/jenkins"
+        }
+    ]
+}
+....
+Step 3:: Verify that your Docker images exist by running the docker images command.
++
+[source,shell]
+----
+docker images
+----
++
+[.output]
+....
+REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE
+jenkinsci/blueocean    latest              4d0bb6a1ea87        12 hours ago        468MB
+xebialabs/xl-release   8.2                 95a054bc36b1        34 hours ago        450MB
+xebialabs/xl-deploy    8.2                 3d919b4d1152        2 days ago          492MB
+....
++
+Step 4:: Tag the xl-release image so you can push the image to the ECR repository.
++
+[source,shell]
+----
+docker tag xebialabs/xl-release:8.2 $(aws ecr describe-repositories --repository-name xl-release --query=repositories[0].repositoryUri --output=text):latest
+----
++
+Step 5:: Run the following command to push this image to the ECR repository.
++
+[source,shell]
+----
+docker push $(aws ecr describe-repositories --repository-name xl-release --query=repositories[0].repositoryUri --output=text):latest
+----
++
+You should see the Docker image being pushed:
++
+[.output]
+....
+The push refers to repository [123456789012.dkr.ecr.us-west-2.amazonaws.com/xl-release]
+ac569cf55cef: Preparing 
+ac569cf55cef: Pushed 
+4d82530a473a: Pushed 
+b26eba6e31c5: Pushed 
+8ff3ab793075: Pushed 
+e33b9a7944b8: Pushed 
+963ed4f795e4: Pushed 
+55004fc58b84: Pushed 
+09634cbb6441: Pushed 
+8b15606a9e3e: Pushed 
+latest: digest: sha256:a4e06b57076093d94428183c86443f98236db83dc7e1010117983db1054784f8 size: 2204
+....
++
+Step 6:: Now you need to do the same thing with xl-deploy. Tag the image so you can push to the ECR repository. 
++
+[source,shell]
+----
+docker tag xebialabs/xl-deploy:8.2 $(aws ecr describe-repositories --repository-name xl-deploy --query=repositories[0].repositoryUri --output=text):latest
+----
++
+Step 7:: Run the following command to push this image to the ECR repository.
++
+[source,shell]
+----
+docker push $(aws ecr describe-repositories --repository-name xl-deploy --query=repositories[0].repositoryUri --output=text):latest
+----
++
+You should see the Docker image being pushed:
++
+[.output]
+....
+The push refers to repository [926301150519.dkr.ecr.us-east-1.amazonaws.com/xl-deploy]
+b38ebd49a934: Pushed 
+e6a9ce1dc446: Pushed 
+a6cfcb0bd72d: Pushed 
+8ff3ab793075: Pushed 
+e33b9a7944b8: Pushed 
+963ed4f795e4: Pushed 
+55004fc58b84: Pushed 
+09634cbb6441: Pushed 
+8b15606a9e3e: Pushed 
+latest: digest: sha256:22df13e8c9dab72f28f6db7233b25a90b340ce3934977f11498cdac8ad22b04e size: 2204
+....
+
+We will stop here and work on our Jenkins image in the next module. Once complete, with the three images pushed to Amazon ECR we will be ready to deploy them to our ochestrators.
+
+****
+Please proceed to `./modules/jenkins` when finished.
+****
