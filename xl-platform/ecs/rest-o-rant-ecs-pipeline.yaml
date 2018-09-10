@@ -41,7 +41,7 @@ spec:
 
           Open the web site by running this command:
           ```
-          demo/ecs/open-rest-o-rant-web
+          ecs/open-rest-o-rant-web
           ```
     - name: Clean up
       color: '#999999'

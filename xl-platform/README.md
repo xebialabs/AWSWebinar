@@ -20,11 +20,11 @@ This workshop will teach you:
 
 # Get the workshop
 
-1) Download and extract the workshop zip:
+1) Download and extract the workshop zip into directory of your choice:
 ```
 $ curl -LO https://github.com/xebialabs/AWSWebinar/archive/master.zip
-$ unzip AWSWebinar-master.zip
-$ cd AWSWebinar-master/modules/xlr-ecs
+$ unzip master.zip
+$ cd master/xl-platform
 ```
 
 # Start up the XL DevOps Platform
@@ -38,7 +38,7 @@ $ docker-compose up --build
 
 3) Wait for XL Deploy and XL Release to have started up. This will have occurred when the following line is shown in the logs:
 ```
-xlrecs_xl-cli_1 exited with code 0
+xlplatform_xl-cli_1 exited with code 0
 ```
 
 1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.3**.
