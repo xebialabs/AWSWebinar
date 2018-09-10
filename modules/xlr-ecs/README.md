@@ -2,17 +2,21 @@
 
 This workshop will teach you:
 
-* How to start up the XL DevOps Platform with the devops-as-code features installed.
+* How to start up the XL DevOps Platform with docker.
 * How to install the XL CLI.
 * How to provision AWS EC2 Container Service (ECS) with Fargate using XL Platform
 * How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Platform
 
 ## Prerequisites
 
-You'll need to have Docker installed on your machine before you begin:
-* Mac: https://docs.docker.com/docker-for-mac/
-* Windows: https://docs.docker.com/docker-for-windows/
-* Linux: Refer to the instructions for your Linux distribution on how to install Docker
+1. You'll need to have Docker installed on your machine before you begin:
+    * Mac: https://docs.docker.com/docker-for-mac/
+    * Windows: https://docs.docker.com/docker-for-windows/
+    * Linux: Refer to the instructions for your Linux distribution on how to install Docker
+
+2. AWS Command Line Tools
+
+3. Python 3.6 or up
 
 # Get the workshop
 
@@ -34,7 +38,7 @@ $ docker-compose up --build
 
 3) Wait for XL Deploy and XL Release to have started up. This will have occurred when the following line is shown in the logs:
 ```
-devops-as-code-demo-workshop-1_xl-cli_1 exited with code 0
+xlrecs_xl-cli_1 exited with code 0
 ```
 
 1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.3**.
@@ -45,16 +49,9 @@ devops-as-code-demo-workshop-1_xl-cli_1 exited with code 0
 
 1) Open a new terminal window and install the XL command line client:
 
-## Mac
+## Mac/Linux
 ```
 $ curl -LO https://s3.amazonaws.com/xl-cli/bin/8.2.0-alpha.9/darwin-amd64/xl
-$ chmod +x xl
-$ sudo mv xl /usr/local/bin
-```
-
-## Linux
-```
-$ curl -LO https://s3.amazonaws.com/xl-cli/bin/8.2.0-alpha.9/linux-amd64/xl
 $ chmod +x xl
 $ sudo mv xl /usr/local/bin
 ```
@@ -90,13 +87,10 @@ Flags:
 Use "xl [command] --help" for more information about a command.
 ```
 
-# Application on AWS EC2 Container Service (ECS) with Fargate
+# Deploying applications on AWS EC2 Container Service (ECS) with Fargate
 
 This demos show you how to deploy to ECS with XL Deploy.
 
-## Prerequisites
-* AWS Command Line Tools
-* Python 3.6 or up
 
 ## Step 1 - Configure AWS in XL Deploy
 
@@ -137,3 +131,5 @@ $ xl apply -f ecs/rest-o-rant-ecs-pipeline.yaml
 3. Start a release from the "REST-o-rant on ECS" template.
 
 4. Follow the instructions.
+
+5. Click on "start release" on the release page.

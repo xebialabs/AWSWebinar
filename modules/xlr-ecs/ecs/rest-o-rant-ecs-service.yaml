@@ -16,7 +16,7 @@ spec:
           desiredCount: 1
           launchType: FARGATE
           networkMode: awsvpc
-          assignPublicIp: ENABLED
+          assignPublicIp: true
           cpu: 512
           memory: 1024
           subnets:
