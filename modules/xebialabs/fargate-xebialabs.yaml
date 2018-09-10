@@ -228,7 +228,7 @@ Resources:
         Fn::GetAtt: FargateTaskRole.Arn
       ContainerDefinitions:
       - Name: xl-release
-        Image: xebialabs/xl-release:8.2
+        Image: xebialabsunsupported/xl-release:8.2
         PortMappings:
         - ContainerPort: 5516
           Protocol: tcp
