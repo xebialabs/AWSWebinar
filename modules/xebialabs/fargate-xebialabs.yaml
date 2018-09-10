@@ -182,8 +182,7 @@ Resources:
         Fn::GetAtt: FargateTaskRole.Arn
       ContainerDefinitions:
       - Name: xl-deploy
-        Image: 
-          Fn::Sub: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/xl-deploy:latest
+        Image: xebialabs/xl-deploy:8.2
         PortMappings:
         - ContainerPort: 4516
           Protocol: tcp
@@ -229,8 +228,7 @@ Resources:
         Fn::GetAtt: FargateTaskRole.Arn
       ContainerDefinitions:
       - Name: xl-release
-        Image: 
-          Fn::Sub: ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/xl-release:latest
+        Image: xebialabs/xl-release:8.2
         PortMappings:
         - ContainerPort: 5516
           Protocol: tcp
