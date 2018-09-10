@@ -1,0 +1,211 @@
+= XebiaLabs and AWS
+
+:imagesdir: ../../images
+
+== Getting Started
+
+****
+*Expected Outcome:*
+
+* Deploy Jenkins to AWS Fargate
+
+*Requirements:*
+Completion of `./modules/container-registry` module.
+****
+
+== Introduction
+
+https://jenkins.io/[Jenkins] is the leading open source automation server, providing hundreds of plugins to support building, deploying and automating any project. AWS has developed an official https://wiki.jenkins.io/display/JENKINS/AWS+CodeBuild+Plugin[AWS CodeBuild plugin] for Jenkins. https://aws.amazon.com/codebuild/[AWS CodeBuild] is a fully managed build service that compiles source code, runs tests, and produces software packages that are ready to deploy.
+
+XebiaLabs also developed an official https://docs.xebialabs.com/xl-release/how-to/using-the-xl-release-plugin-for-jenkins.html[plugin] for XL Release and Jenkins which we will discuss further on.
+
+In this module, we will begin with the https://jenkins.io/doc/book/installing/[recommended] Docker image for Jenkins which is the https://hub.docker.com/r/jenkinsci/blueocean/[jenkinsci/blueocean image] from the https://hub.docker.com/[Docker Hub repository]. We will pull this image, and build a new image that includes the AWS CodeBuild plugin for Jenkins, then push the new image to ECR.
+
+Before we get started lets first change to the module directory.
+
+[source,shell]
+----
+cd ~/environment/AWSWebinar/modules/jenkins
+----
+
+==== Reviewing the Dockerfile
+Let's review the `Dockerfile`. First, we will base our image from the official Jenkins image.
+
+[source,shell]
+----
+FROM jenkinsci/blueocean AS build
+----
+
+Next, we will copy our local `plugins.txt` file containing a list of suggested plugins as well as the AWS CodeBuild plugin to our container.
+
+[source,shell]
+----
+COPY plugins.txt /usr/share/jenkins/plugins.txt
+----
+
+Lastly, we will download and install the plugins onto our new image.
+
+[source,shell]
+----
+RUN xargs /usr/local/bin/install-plugins.sh < /usr/share/jenkins/plugins.txt
+----
+
+==== Building the Docker image
+
+Now, we are ready to build our image. 
+
+[source,shell]
+----
+docker build . --tag jenkins --no-cache
+----
++
+You should see Docker image being created:
++
+[.output]
+....
+Sending build context to Docker daemon   12.8kB
+Step 1/3 : FROM jenkinsci/blueocean AS build
+ ---> 883ffefb4254
+Step 2/3 : COPY plugins.txt /usr/share/jenkins/plugins.txt
+ ---> f94f9612d575
+Step 3/3 : RUN xargs /usr/local/bin/install-plugins.sh < /usr/share/jenkins/plugins.txt
+ ---> Running in 719aa2e9357d
+Creating initial locks...
+Analyzing war...
+Registering preinstalled plugins...
+Using version-specific update center: https://updates.jenkins.io/2.121...
+Downloading plugins...
+Downloading plugin: ant from https://updates.jenkins.io/2.121/latest/ant.hpi
+Downloading plugin: ace-editor from https://updates.jenkins.io/2.121/latest/ace-editor.hpi
+...
+Cleaning up locks
+Removing intermediate container 719aa2e9357d
+ ---> 14da74566fb6
+Successfully built 14da74566fb6
+Successfully tagged jenkins:latest
+....
+
+==== Tagging and pushing the image to ECR
+
+Step 1:: Log into your Amazon ECR registry using the helper provided by the AWS CLI in the Cloud9 terminal:
++
+[source,shell]
+----
+eval $(aws ecr get-login --no-include-email)
+----
+Step 2:: Tag the jenkins image so you can push the image to the ECR repository.
++
+[source,shell]
+----
+docker tag jenkins $(aws ecr describe-repositories --repository-name jenkins --query=repositories[0].repositoryUri --output=text):latest
+----
++
+Step 3:: Run the following command to push this image to the ECR repository.
++
+[source,shell]
+----
+docker push $(aws ecr describe-repositories --repository-name jenkins --query=repositories[0].repositoryUri --output=text):latest
+----
++
+You should see the Docker image being pushed:
++
+[.output]
+....
+The push refers to repository [123456789012.dkr.ecr.us-west-2.amazonaws.com/jenkins]
+ac569cf55cef: Preparing 
+ac569cf55cef: Pushed 
+4d82530a473a: Pushed 
+b26eba6e31c5: Pushed 
+8ff3ab793075: Pushed 
+e33b9a7944b8: Pushed 
+963ed4f795e4: Pushed 
+55004fc58b84: Pushed 
+09634cbb6441: Pushed 
+8b15606a9e3e: Pushed 
+latest: digest: sha256:a4e06b57076093d94428183c86443f98236db83dc7e1010117983db1054784f8 size: 2204
+....
+
+===== Launch the Cloudformation template
+[source,shell]
+----
+aws cloudformation create-stack --stack-name "xebialabs-jenkins" \
+  --template-body=file://fargate-jenkins.yaml
+  --parameters ParameterKey=ClusterName,ParameterValue="Jenkins" \
+  --capabilities CAPABILITY_IAM
+----
+
+Wait for the CloudFormation template to successfully deploy.
+
+[source,shell]
+----
+until [[ `aws cloudformation describe-stacks --stack-name "xebialabs-jenkins" --query "Stacks[0].[StackStatus]" --output text` == "CREATE_COMPLETE" ]]; do  echo "The stack is NOT in a state of CREATE_COMPLETE at `date`";   sleep 30; done && echo "The Stack is built at `date` - Please proceed"
+----
+
+===== Get the initial Jenkins admin password
+Since our instance of Jenkins is running as a container on Fargate, this means that we will not be able to run commands on our running container. Fortunately, we are writing our logs to https://aws.amazon.com/cloudwatch[Amazon CloudWatch], so we can browse those logs and obtain our password. 
+
+Let's open a new tab on our browser and navigate to the https://console.aws.amazon.com/cloudwatch[CloudWatch console]. We will look for the Log Group that has the `xebialabs-jenkins-FargateLogGroup-*` prefix and `Expand all`. You should be able to find the section in the logs with the initial admin password as below:
+
+image::jenkins-01.png[jenkins]
+
+Copy and paste the password.
+
+===== Get the container IP
+In a production environment, you will want to front your ECS service using an Amazon Application LoadBalancer, but for the purpose of this lab, we will simply connect directly to the container public IP address.
+
+[source,shell]
+----
+aws ec2 describe-network-interfaces \
+  --network-interface-ids=$(aws ecs describe-tasks --cluster=Jenkins \
+    --tasks=`aws ecs list-tasks \
+    --cluster=Jenkins \
+    --query taskArns[0] \
+    --output=text` \
+    --query tasks[0].attachments[0].details[1].value \
+    --output=text) \
+  --query NetworkInterfaces[0].Association.PublicIp \
+  --output=text
+----
+
+===== Getting started with Jenkins
+
+Now that we have both our public IP address and our initial password, let's complete our Jenkins configuration.
+
+Step 1:: Open a new tab in your web browser and point to `http://<public_ip>:8080`
+
++
+image::jenkins-02.png[jenkins]
++
+Paste the initial password you obtained form the CloudWatch logs and click `Continue`.
+
+Step 2:: Select `Install suggested plugins`.
+
++
+image::jenkins-03.png[jenkins]
++
+In this case, our plugins have already been preinstalled so this should instantly bring you to the next prompt.
+
+Step 3:: Create First Admin User:
+
++
+image::jenkins-04.png[jenkins]
++
+You may optionally create an admin user by completing all of the fields and clicking the `Save and Continue` button. Otherwise, click `Continue as admin` to proceed.
+
+Step 4:: Instance Configuration:
+
++
+image::jenkins-05.png[jenkins]
++
+Your public IP address and port should already be pre-populated. Simply click `Save and Finish` to complete the initial configuration.
+
+Step 5:: Jenkins is ready!
+
++
+image::jenkins-06.png[jenkins]
++
+Click on `Start using Jenkins` to launch the admin console.
+
+****
+Please proceed to `./modules/xebialabs` when finished.
+****
