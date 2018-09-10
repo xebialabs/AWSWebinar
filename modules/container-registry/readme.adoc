@@ -30,7 +30,7 @@ cd ~/environment/AWSWebinar/modules/container-registry
 [source,shell]
 ----
 aws cloudformation create-stack --stack-name "xebialabs-ecr" \
-  --template-body=file://ecr.yml
+  --template-body=file://ecr.yaml
 ----
 
 Wait for the CloudFormation template to successfully deploy.
