@@ -263,7 +263,7 @@ image::xebialabs-02.png[xebialabs]
 Step 2::
 You will need to copy+paste the license key received from XebiaLabs. If successfully applied you can proceed and click on `Get started`:
 +
-image::xebialabs-03.png[xebialabs]
+image::xebialabs-06.png[xebialabs]
 
 Step 3::
 Login to your instance of XL-Deploy using the default `admin` user and `admin` password.
@@ -271,6 +271,6 @@ Login to your instance of XL-Deploy using the default `admin` user and `admin` p
 image::xebialabs-04.png[xebialabs]
 
 Step 4::
-You are now in the admin console and ready to begin your first `Deploy`.
+You are now in the admin console and ready to `Start a deployment`.
 +
-image::xebialabs-06.png[xebialabs]
+image::xebialabs-07.png[xebialabs]
