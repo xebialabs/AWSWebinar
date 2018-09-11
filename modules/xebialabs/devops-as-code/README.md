@@ -3,7 +3,7 @@
 This workshop will teach you:
 
 * How to start up the XL DevOps Platform locally with docker.
-* How to install the XL CLI.
+* How to install the XL CLI(alpha).
 * How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Platform
 * How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Platform
 
@@ -22,9 +22,9 @@ This workshop will teach you:
 
 1) Download and extract the workshop zip into directory of your choice:
 ```
-$ curl -LO https://github.com/xebialabs/AWSWebinar/archive/master.zip
-$ unzip master.zip
-$ cd master/modules/xebialabs/devops-as-code
+curl -LO https://github.com/xebialabs/AWSWebinar/archive/master.zip
+unzip master.zip
+cd master/modules/xebialabs/devops-as-code
 ```
 
 # Start up the XL DevOps Platform
@@ -33,7 +33,7 @@ $ cd master/modules/xebialabs/devops-as-code
 
 2) Start up the XL DevOps Platform:
 ```
-$ docker-compose up --build
+docker-compose up --build
 ```
 
 3) Wait for XL Deploy and XL Release to have started up. This will have occurred when the following line is shown in the logs:
@@ -41,29 +41,38 @@ $ docker-compose up --build
 devopsascode_xl-cli_1 exited with code 0
 ```
 
-1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.3**.
+1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.13**.
 
-2) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.3**.
+2) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.9**.
 
 # Install the XL CLI
 
+Please note that XL CLI is in alpha stage and will be released at the end of 2018
+
 1) Open a new terminal window and install the XL command line client:
 
-## Mac/Linux
+## Mac
 ```
-$ curl -LO https://s3.amazonaws.com/xl-cli/bin/8.2.0-alpha.9/darwin-amd64/xl
-$ chmod +x xl
-$ sudo mv xl /usr/local/bin
+curl -LO https://s3.amazonaws.com/xl-cli/bin/8.5.0-alpha.2/darwin-amd64/xl
+chmod +x xl
+sudo mv xl /usr/local/bin
+```
+
+## Linux
+```
+curl -LO https://s3.amazonaws.com/xl-cli/bin/8.5.0-alpha.2/linux-amd64/xl
+chmod +x xl
+sudo mv xl /usr/local/bin
 ```
 
 ## Windows
 ```
-> curl -LO https://s3.amazonaws.com/xl-cli/bin/8.2.0-alpha.9/windows-amd64/xl.exe
+> curl -LO https://s3.amazonaws.com/xl-cli/bin/8.5.0-alpha.2/windows-amd64/xl.exe
 ```
 
 2) Test the CLI by running the following the following command:
 ```
-$ xl help
+xl help
 ```
 
 The output should look something like this:
@@ -103,13 +112,13 @@ This demo will not use the AWS command line interface itself, but will use the [
 Once you've configured the AWS command line interface, use the `awsconfig2xld.py` script in the `config` directory to create XL YAML files that will create the AWS environment in XL Deploy.
 
 ```
-$ config/awsconfig2xld.py > /tmp/AWSConfig.yaml
+config/awsconfig2xld.py > /tmp/AWSConfig.yaml
 ```
 
 Now send this file to XL Deploy using
 
 ```
-$ xl apply -f /tmp/AWSConfig.yaml
+xl apply -f /tmp/AWSConfig.yaml
 ```
 
 ## Step 2 - Import the REST-o-rant YAML definitions:
@@ -117,19 +126,19 @@ $ xl apply -f /tmp/AWSConfig.yaml
 Import the REST-o-rant ECS/Fargate cluster definition for AWS into XL Deploy:
 
 ```
-$ xl apply -f ecs/rest-o-rant-ecs-fargate-cluster.yaml
+xl apply -f ecs/rest-o-rant-ecs-fargate-cluster.yaml
 ```
 
 Import the REST-o-rant application definition into XL Deploy:
 
 ```
-$ xl apply -f ecs/rest-o-rant-ecs-service.yaml
+xl apply -f ecs/rest-o-rant-ecs-service.yaml
 ```
 
 Import the release pipeline into XL Release:
 
 ```
-$ xl apply -f ecs/rest-o-rant-ecs-pipeline.yaml
+xl apply -f ecs/rest-o-rant-ecs-pipeline.yaml
 ```
 
 ## Step 3 - Start the release pipeline

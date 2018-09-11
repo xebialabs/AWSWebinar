@@ -1,4 +1,28 @@
-apiVersion: xl-release/v1
+apiVersion: xl-release/v1beta1
+kind: Configurations
+spec:
+- name: rest-o-rant-api-repository
+  type: git.Repository
+  url: https://github.com/xebialabs/rest-o-rant-api
+  authenticationMethod: none
+  username: notNeededForPublicRepo
+  password: notNeededForPublicRepo
+
+---
+    
+apiVersion: xl-release/v1beta1
+kind: Configurations
+spec:
+- name: rest-o-rant-web-repository
+  type: git.Repository
+  url: https://github.com/xebialabs/rest-o-rant-web
+  authenticationMethod: none
+  username: notNeededForPublicRepo
+  password: notNeededForPublicRepo
+
+---
+
+apiVersion: xl-release/v1beta1
 kind: Templates
 spec:
 - name: REST-o-rant
@@ -19,9 +43,19 @@ spec:
       pollType: REPEAT
       periodicity: 10
       enabled: true
-      gitRepository: <your git repository>
+      gitRepository: rest-o-rant-api-repository
       username: <your git username>
       password: <your git password>
+    # - type: git.Poll
+    #   initialFire: false
+    #   name: Git poll trigger
+    #   releaseTitle: Release created by Git trigger
+    #   pollType: REPEAT
+    #   periodicity: 10
+    #   enabled: true
+    #   gitRepository: rest-o-rant-web-repository
+    #   username: <your git username>
+    #   password: <your git password>
     phases:
     - name: Deploy
       color: '#ff9e3b'
