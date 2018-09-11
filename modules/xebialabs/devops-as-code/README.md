@@ -2,9 +2,9 @@
 
 This workshop will teach you:
 
-* How to start up the XL DevOps Platform with docker.
+* How to start up the XL DevOps Platform locally with docker.
 * How to install the XL CLI.
-* How to provision AWS EC2 Container Service (ECS) with Fargate using XL Platform
+* How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Platform
 * How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Platform
 
 ## Prerequisites
@@ -24,7 +24,7 @@ This workshop will teach you:
 ```
 $ curl -LO https://github.com/xebialabs/AWSWebinar/archive/master.zip
 $ unzip master.zip
-$ cd master/xl-platform
+$ cd master/modules/xebialabs/devops-as-code
 ```
 
 # Start up the XL DevOps Platform
@@ -38,7 +38,7 @@ $ docker-compose up --build
 
 3) Wait for XL Deploy and XL Release to have started up. This will have occurred when the following line is shown in the logs:
 ```
-xlplatform_xl-cli_1 exited with code 0
+devopsascode_xl-cli_1 exited with code 0
 ```
 
 1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.3**.
@@ -112,13 +112,23 @@ Now send this file to XL Deploy using
 $ xl apply -f /tmp/AWSConfig.yaml
 ```
 
-## Step 2 - Import the REST-o-rant YAML definition:
+## Step 2 - Import the REST-o-rant YAML definitions:
 
 Import the REST-o-rant ECS/Fargate cluster definition for AWS into XL Deploy:
 
 ```
 $ xl apply -f ecs/rest-o-rant-ecs-fargate-cluster.yaml
+```
+
+Import the REST-o-rant application definition into XL Deploy:
+
+```
 $ xl apply -f ecs/rest-o-rant-ecs-service.yaml
+```
+
+Import the release pipeline into XL Release:
+
+```
 $ xl apply -f ecs/rest-o-rant-ecs-pipeline.yaml
 ```
 
@@ -128,7 +138,7 @@ $ xl apply -f ecs/rest-o-rant-ecs-pipeline.yaml
 
 2. Go to the Templates page under the Design tab.
 
-3. Start a release from the "REST-o-rant on ECS" template.
+3. Start a new release from the "REST-o-rant on ECS" template.
 
 4. Follow the instructions.
 

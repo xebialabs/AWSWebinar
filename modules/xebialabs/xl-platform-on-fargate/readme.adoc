@@ -1,6 +1,6 @@
 = XebiaLabs and AWS
 
-:imagesdir: ../../images
+:imagesdir: ../../../images
 
 == Getting Started
 ****
