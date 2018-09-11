@@ -11,6 +11,17 @@ spec:
     tags:
     - REST-o-rant
     - ECS
+    releaseTriggers:
+    - type: git.Poll
+      initialFire: false
+      name: Git poll trigger
+      releaseTitle: Release created by Git trigger
+      pollType: REPEAT
+      periodicity: 10
+      enabled: true
+      gitRepository: <your git repository>
+      username: <your git username>
+      password: <your git password>
     phases:
     - name: Deploy
       color: '#ff9e3b'

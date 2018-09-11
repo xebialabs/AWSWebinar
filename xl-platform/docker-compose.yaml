@@ -59,3 +59,9 @@ services:
       - TASKS=1
       - VERSION=1
       - VOLUMES=1
+
+  jenkins:
+    image: jenkins:2.0
+    ports:
+      - 49001:8080
+      - 50000:50000
