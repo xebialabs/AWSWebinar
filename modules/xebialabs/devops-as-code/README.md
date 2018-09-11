@@ -2,7 +2,7 @@
 
 This workshop will teach you:
 
-* How to start up the XL DevOps Platform locally with docker.
+* How to start up the XL DevOps Platform and Jenkins locally with docker.
 * How to install the XL CLI(alpha).
 * How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Platform
 * How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Platform
@@ -29,14 +29,14 @@ cd master/modules/xebialabs/devops-as-code
 
 # Start up the XL DevOps Platform
 
-1) If you are already running XL Deploy or XL Release on your local machine, please stop them.
+1) If you are already running XL Deploy, XL Release or Jenkins on your local machine, please stop them.
 
-2) Start up the XL DevOps Platform:
+2) Start up the XL DevOps Platform and Jenkins server:
 ```
 docker-compose up --build
 ```
 
-3) Wait for XL Deploy and XL Release to have started up. This will have occurred when the following line is shown in the logs:
+3) Wait for XL Deploy, XL Release and Jenkins to have started up. This will have occurred when the following line is shown in the logs:
 ```
 devopsascode_xl-cli_1 exited with code 0
 ```
@@ -44,6 +44,8 @@ devopsascode_xl-cli_1 exited with code 0
 1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.13**.
 
 2) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.9**.
+
+3) Open the Jenkins GUI at http://localhost:49001/ and verify its up and running.
 
 # Install the XL CLI
 
@@ -121,7 +123,7 @@ Now send this file to XL Deploy using
 xl apply -f /tmp/AWSConfig.yaml
 ```
 
-## Step 2 - Import the REST-o-rant YAML definitions:
+## Step 2 - Import the REST-o-rant YAML definitions into XL Deploy:
 
 Import the REST-o-rant ECS/Fargate cluster definition for AWS into XL Deploy:
 
@@ -129,26 +131,41 @@ Import the REST-o-rant ECS/Fargate cluster definition for AWS into XL Deploy:
 xl apply -f ecs/rest-o-rant-ecs-fargate-cluster.yaml
 ```
 
+// TODO configure to point to latest image from docker registry of user
+
 Import the REST-o-rant application definition into XL Deploy:
 
 ```
 xl apply -f ecs/rest-o-rant-ecs-service.yaml
 ```
 
-Import the release pipeline into XL Release:
+## Step 3 - Create the release pipeline
+
+First fork the below repositories into your Github account, so that you can trigger releases on commit.
+
+```
+https://github.com/xebialabs/rest-o-rant-web
+https://github.com/xebialabs/rest-o-rant-api
+```
+
+Open `ecs/rest-o-rant-ecs-pipeline.yaml` in a text editor and update the references of the above repositories with the URL your own forks.
+
+Now open [Jenkins server](http://localhost:49001/) and click on "create new jobs" and create a pipeline job with name "release-web". Leave default options except in the Pipeline section. Choose "Pipeline script from SCM" as definition and "Git" as the SCM. Provide the URL of your forked "rest-o-rant-web" repository. Provide "Jenkinsfile-release" as the Script Path.
+
+Now repeat the same to create a pipeline job with name "release-api" for the "rest-o-rant-api" repository.
+
+Now import the release pipeline into XL Release:
+
+// TODO configure jenkins job to push to users docker registry
 
 ```
 xl apply -f ecs/rest-o-rant-ecs-pipeline.yaml
 ```
 
-## Step 3 - Start the release pipeline
+## Step 4 - Start the release pipeline
 
 1. Go to the XL Release UI running on http://localhost:5516.
 
-2. Go to the Templates page under the Design tab.
+2. Make a commit to one of the repository forks you made.
 
-3. Start a new release from the "REST-o-rant on ECS" template.
-
-4. Follow the instructions.
-
-5. Click on "start release" on the release page.
+3. Go to the Releases tab in XL Release and you should see a new release with name "Release created by Git trigger from rest-o-rant-api" or "Release created by Git trigger from rest-o-rant-web" depending on where you made the commit.

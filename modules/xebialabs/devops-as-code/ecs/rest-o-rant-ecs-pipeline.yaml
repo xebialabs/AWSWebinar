@@ -3,7 +3,8 @@ kind: Configurations
 spec:
 - name: rest-o-rant-api-repository
   type: git.Repository
-  url: https://github.com/xebialabs/rest-o-rant-api
+  url: https://github.com/deepu105/rest-o-rant-api
+  # url: https://github.com/xebialabs/rest-o-rant-api
   authenticationMethod: none
   username: notNeededForPublicRepo
   password: notNeededForPublicRepo
@@ -15,7 +16,8 @@ kind: Configurations
 spec:
 - name: rest-o-rant-web-repository
   type: git.Repository
-  url: https://github.com/xebialabs/rest-o-rant-web
+  url: https://github.com/deepu105/rest-o-rant-web
+  # url: https://github.com/xebialabs/rest-o-rant-web
   authenticationMethod: none
   username: notNeededForPublicRepo
   password: notNeededForPublicRepo
@@ -39,7 +41,7 @@ spec:
     - type: git.Poll
       initialFire: false
       name: Git poll trigger for api
-      releaseTitle: Release created by Git trigger
+      releaseTitle: Release created by Git trigger from rest-o-rant-api
       pollType: REPEAT
       periodicity: 10
       enabled: true
@@ -49,7 +51,7 @@ spec:
     - type: git.Poll
       initialFire: false
       name: Git poll trigger for web
-      releaseTitle: Release created by Git trigger
+      releaseTitle: Release created by Git trigger from rest-o-rant-web
       pollType: REPEAT
       periodicity: 10
       enabled: true
@@ -61,9 +63,14 @@ spec:
       color: '#ff9e3b'
       type: xlrelease.Phase
       tasks:
-      - name: Ready to go?
-        type: xlrelease.GateTask
-        team: Release Admin
+      - name: Build api
+        type: jenkins.Build
+        jenkinsServer: Jenkins
+        jobName: release-api
+      - name: Build web
+        type: jenkins.Build
+        jenkinsServer: Jenkins
+        jobName: release-web
       - name: Provision ECS cluster (with Fargate support)
         type: xldeploy.Deploy
         server: XL Deploy
