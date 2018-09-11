@@ -4,7 +4,9 @@ spec:
 - name: local-docker
   type: docker.Engine
   dockerHost: http://dockerproxy:2375
+
 ---
+
 apiVersion: xl-release/v1beta1
 kind: Configurations
 spec:
@@ -13,3 +15,14 @@ spec:
   url: http://xl-deploy:4516
   username: admin
   password: admin
+
+---
+
+apiVersion: xl-release/v1beta1
+kind: Configurations
+spec:
+- name: Jenkins
+  type: jenkins.Server
+  url: http://jenkins:8080
+  username:
+  password:

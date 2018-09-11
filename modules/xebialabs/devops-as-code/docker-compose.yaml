@@ -61,7 +61,9 @@ services:
       - VOLUMES=1
 
   jenkins:
-    image: jenkins:2.0
+    image: jenkinsci/blueocean:latest
     ports:
       - 49001:8080
       - 50000:50000
+    environment:
+    - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
