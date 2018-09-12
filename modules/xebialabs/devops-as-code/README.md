@@ -152,10 +152,14 @@ Import the release pipeline into XL Release:
 
 1. Go to the XL Release UI running on http://localhost:5516.
 
-2. Go to the Templates page under the Design tab.
+2. Go to the "Templates" page under the "Design" tab.
 
-3. Start a new release from the "REST-o-rant on ECS" template.
+3. Start a "New release" from the "REST-o-rant on ECS" template.
 
-4. Follow the instructions.
+4. Provide a "Release name" and "Create" the release.
 
-5. Click on "start release" on the release page.
+5. Click on "Start release" on the release page.
+
+6. Start the release by completing the first manual step titled "Ready to go?"
+
+7. Once the applications are deployed, complete the "Test REST-o-rant" step from the "Test" phase to do automatic cleanup.
