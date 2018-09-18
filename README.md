@@ -18,3 +18,5 @@ All required steps described at [page](https://github.com/xebialabs/AWSWebinar/t
 ## XebiaLabs Devops Platform
 
 Deploy XebiaLabs Release and XebiaLabs Deploy to Fargate following [instructions](https://github.com/xebialabs/AWSWebinar/blob/master/modules/xebialabs/xl-platform-on-fargate/readme.adoc#getting-started)
+
+Provision AWS Fargate and Deploy applications to it using the XL Platform by following [instructions](https://github.com/xebialabs/AWSWebinar/tree/master/modules/xebialabs/devops-as-code)
