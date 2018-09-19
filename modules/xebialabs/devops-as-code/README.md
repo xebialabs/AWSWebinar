@@ -16,7 +16,7 @@ This workshop will teach you:
 
 2. AWS Command Line Tools
 
-3. Python 3.6 or up
+3. Python 3.6 or up and yaml module installed (e.g. `pip3 install pyyaml`)
 
 # Get the workshop
 
