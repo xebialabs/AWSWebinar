@@ -33,7 +33,8 @@ This workshop will teach you:
 
 2) Start up the XL DevOps Platform:
 ```
- docker-compose up --build
+ docker-compose up --build -d
+ docker-compose logs -f
 ```
 
 3) Wait for XL Deploy and XL Release to have started up. This will have occurred when the following line is shown in the logs:
