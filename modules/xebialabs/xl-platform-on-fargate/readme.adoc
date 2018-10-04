@@ -32,9 +32,16 @@ It also creates services and task definitions for XL Deploy and XL Release.
 == Deploy XL Release and XL Deploy
 === Launch the Cloudformation template
 Make sure your current working directory is correct:
+
+====== Linux and macOS:
 [source,shell]
 ----
 cd AWSWebinar/modules/xebialabs/xl-platform-on-fargate
+----
+====== Windows:
+[source,shell]
+----
+cd AWSWebinar\modules\xebialabs\xl-platform-on-fargate
 ----
 Create CloudFormation stack using aws cli.
 
