@@ -33,8 +33,9 @@ This workshop will teach you:
 ```
 curl -LO https://github.com/xebialabs/AWSWebinar/archive/master.zip
 ```
-- Unzip archive using GUI tool
-- Switch your working directory
+or download it in browser from [link](https://github.com/xebialabs/AWSWebinar/archive/master.zip). Aftewards, unzip archive using archive GUI tool.
+
+2) Switch your working directory:
 ```
 cd master\AWSWebinar-master\modules\xebialabs\devops-as-code
 ```
@@ -50,9 +51,17 @@ cd master\AWSWebinar-master\modules\xebialabs\devops-as-code
 
 3) Wait for XL Deploy and XL Release to have started up.
 
-1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.13**.
+4) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.13**.
 
-2) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.9**.
+5) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.9**.
+
+*Windows (optionally)*
+
+In case of Docker Toolbox installation, you need to refer to Docker machine IP instead of localhost. Get the Docker machine IP:
+```
+docker-machine ip
+```
+Now you are able to access XL Deploy GUI at http://docker-machine-ip:4516 and XL Release GUI at http://docker-machine-ip:5516.
 
 # Install the XL CLI
 
@@ -216,7 +225,15 @@ We will be deploying the docker images of `rest-o-rant-web` and `rest-o-rant-api
 ```
 ## Step 3 - Start the release pipeline
 
-1. Go to the XL Release UI running on http://localhost:5516.
+1. Go to the XL Release GUI running on http://localhost:5516.
+
+*Windows (Optionally)*
+
+In case of Docker Toolbox installation, you need to refer to Docker machine IP instead of localhost. Get the Docker machine IP:
+```
+docker-machine ip
+```
+Now you are able to access XL Release GUI at http://docker-machine-ip:5516.
 
 2. Go to the "Templates" page under the "Design" tab.
 
