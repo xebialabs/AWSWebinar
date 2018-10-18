@@ -2,7 +2,7 @@
 
 This workshop will teach you:
 
-* How to start up the XL Deploy, XL Release, and Jenkins locally with docker.
+* How to start up XL Deploy, XL Release, and Jenkins locally with docker.
 * How to install the XL CLI(alpha).
 * How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Deploy
 * How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Deploy
@@ -31,7 +31,7 @@ cd master/modules/xebialabs/devops-as-code
 
 1) If you are already running XL Deploy, XL Release, or Jenkins on your local machine, please stop them.
 
-2) Start up the XL Deploy, XL Release, and Jenkins server:
+2) Start up XL Deploy, XL Release, and Jenkins server:
 ```
 docker-compose up --build
 ```
