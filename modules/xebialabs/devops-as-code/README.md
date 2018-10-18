@@ -1,11 +1,11 @@
-# Provisisoning and deploying to AWS Fargate clusters using XL Platform
+# Provisioning and deploying to AWS Fargate clusters using XL Deploy and XL Release
 
 This workshop will teach you:
 
-* How to start up the XL DevOps Platform and Jenkins locally with docker.
+* How to start up the XL Deploy, XL Release, and Jenkins locally with docker.
 * How to install the XL CLI(alpha).
-* How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Platform
-* How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Platform
+* How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Deploy
+* How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Deploy
 
 ## Prerequisites
 
@@ -27,23 +27,23 @@ unzip master.zip
 cd master/modules/xebialabs/devops-as-code
 ```
 
-# Start up the XL DevOps Platform
+# Start up XL Deploy, XL Release and Jenkins
 
-1) If you are already running XL Deploy, XL Release or Jenkins on your local machine, please stop them.
+1) If you are already running XL Deploy, XL Release, or Jenkins on your local machine, please stop them.
 
-2) Start up the XL DevOps Platform and Jenkins server:
+2) Start up the XL Deploy, XL Release, and Jenkins server:
 ```
 docker-compose up --build
 ```
 
-3) Wait for XL Deploy, XL Release and Jenkins to have started up. This will have occurred when the following line is shown in the logs:
+3) Wait for XL Deploy, XL Release and Jenkins to start up. This will have occurred when the following line is shown in the logs:
 ```
 devopsascode_xl-cli_1 exited with code 0
 ```
 
-1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.13**.
+1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the About box reports the version to be **8.5.0-alpha.13**.
 
-2) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.9**.
+2) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the About box reports the version to be **8.5.0-alpha.9**.
 
 3) Open the Jenkins GUI at http://localhost:49001/ and verify its up and running.
 
@@ -100,7 +100,7 @@ Use "xl [command] --help" for more information about a command.
 
 # Deploying applications on AWS EC2 Container Service (ECS) with Fargate
 
-This demos show you how to deploy to ECS with XL Deploy.
+This demo show you how to deploy to ECS with XL Deploy.
 
 
 ## Step 1 - Configure AWS in XL Deploy
