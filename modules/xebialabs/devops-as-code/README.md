@@ -2,7 +2,7 @@
 
 This workshop will teach you:
 
-* How to start up the XebiaLabs DevOps Platform (XL Deploy and XL Release) and Jenkins locally with docker.
+* How to start up the XebiaLabs DevOps Platform (XL Deploy and XL Release) and Jenkins locally with Docker.
 * How to install the XL CLI(alpha).
 * How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Deploy
 * How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Deploy
