@@ -1,8 +1,8 @@
-# Provisioning and deploying to AWS Fargate clusters using XL Deploy and XL Release
+# Provisioning and deploying to AWS Fargate clusters using the XebiaLabs DevOps Platform
 
 This workshop will teach you:
 
-* How to start up XL Deploy, XL Release, and Jenkins locally with docker.
+* How to start up the XebiaLabs DevOps Platform (XL Deploy and XL Release) and Jenkins locally with docker.
 * How to install the XL CLI(alpha).
 * How to provision AWS EC2 Container Service (ECS) with Fargate using the XL Deploy
 * How to deploy an application on AWS EC2 Container Service (ECS) with Fargate using XL Deploy
@@ -36,7 +36,7 @@ cd master/modules/xebialabs/devops-as-code
 docker-compose up --build
 ```
 
-3) Wait for XL Deploy, XL Release and Jenkins to start up. This will have occurred when the following line is shown in the logs:
+3) Wait for XL Deploy, XL Release and Jenkins to start up. This is indicated when the following line is shown in the logs:
 ```
 devopsascode_xl-cli_1 exited with code 0
 ```
@@ -49,7 +49,7 @@ devopsascode_xl-cli_1 exited with code 0
 
 # Install the XL CLI
 
-Please note that XL CLI is in alpha stage and will be released at the end of 2018
+Please note that XL CLI is in alpha stage and will be released at the end of 2018.
 
 1) Open a new terminal window and install the XL command line client:
 
