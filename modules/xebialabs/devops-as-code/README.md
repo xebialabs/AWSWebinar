@@ -20,11 +20,24 @@ This workshop will teach you:
 
 # Get the workshop
 
-1) Download and extract the workshop zip into directory of your choice:
+1) Download and extract the workshop zip into directory of your choice.
+
+*Linux*
 ```
  curl -LO https://github.com/xebialabs/AWSWebinar/archive/master.zip
  unzip master.zip
- cd master/modules/xebialabs/devops-as-code
+ cd AWSWebinar-master/modules/xebialabs/devops-as-code
+```
+
+*Windows*
+```
+curl -LO https://github.com/xebialabs/AWSWebinar/archive/master.zip
+```
+or download it in browser from [link](https://github.com/xebialabs/AWSWebinar/archive/master.zip). Aftewards, unzip archive using archive GUI tool.
+
+2) Switch your working directory:
+```
+cd master\AWSWebinar-master\modules\xebialabs\devops-as-code
 ```
 
 # Start up the XL DevOps Platform
@@ -36,14 +49,19 @@ This workshop will teach you:
  docker-compose up --build
 ```
 
-3) Wait for XL Deploy and XL Release to have started up. This will have occurred when the following line is shown in the logs:
-```
-devopsascode_xl-cli_1 exited with code 0
-```
+3) Wait for XL Deploy and XL Release to have started up.
 
-1) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.13**.
+4) Open the XL Deploy GUI at http://localhost:4516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.13**.
 
-2) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.9**.
+5) Open the XL Release GUI at http://localhost:5516/ and login with the username `admin` and password `admin`. Verify that the about box reports the version to be **8.5.0-alpha.9**.
+
+*Windows (optionally)*
+
+In case of Docker Toolbox installation, you need to refer to Docker machine IP instead of localhost. Get the Docker machine IP:
+```
+docker-machine ip
+```
+Now you are able to access XL Deploy GUI at http://docker-machine-ip:4516 and XL Release GUI at http://docker-machine-ip:5516.
 
 # Install the XL CLI
 
@@ -51,23 +69,26 @@ Please note that XL CLI is in alpha stage and will be released at the end of 201
 
 1) Open a new terminal window and install the XL command line client:
 
-## Mac
+*Mac*
 ```
  curl -LO https://s3.amazonaws.com/xl-cli/bin/8.5.0-alpha.2/darwin-amd64/xl
  chmod +x xl
  sudo mv xl /usr/local/bin
 ```
 
-## Linux
+*Linux*
 ```
  curl -LO https://s3.amazonaws.com/xl-cli/bin/8.5.0-alpha.2/linux-amd64/xl
  chmod +x xl
  sudo mv xl /usr/local/bin
 ```
 
-## Windows
+*Windows*
+
+Switch your working directory to unpacked repo and download binary
 ```
-> curl -LO https://s3.amazonaws.com/xl-cli/bin/8.5.0-alpha.2/windows-amd64/xl.exe
+ cd master\AWSWebinar-master\modules\xebialabs\devops-as-code
+ curl -LO https://s3.amazonaws.com/xl-cli/bin/8.5.0-alpha.2/windows-amd64/xl.exe
 ```
 
 2) Test the CLI by running the following the following command:
@@ -96,6 +117,28 @@ Flags:
 Use "xl [command] --help" for more information about a command.
 ```
 
+3) (optionally) Configure XL cli for Windows
+
+If your Docker installation for Windows uses non-localhost interface to expose ports from docker containers (i.e. you installed Docker with Docker Toolbox), you need:
+- obtain IP address of Docker Machine
+- create custom configuration for XL cli to reach XL Deploy & XL Release at Docker Machine's IP
+
+You can do it using following:
+
+```
+mkdir %UserProfile%\.xebialabs
+for /f %i in ('docker-machine ip') do set IP=%i
+(
+echo xl-deploy:
+echo   password: admin
+echo   url: http://%IP%:4516
+echo   username: admin
+echo xl-release:
+echo   password: admin
+echo   url: http://%IP%:5516
+echo   username: admin
+)>"%UserProfile%\.xebialabs\config.yaml"
+```
 # Deploying applications on AWS EC2 Container Service (ECS) with Fargate
 
 This demos show you how to deploy to ECS with XL Deploy.
@@ -103,22 +146,39 @@ This demos show you how to deploy to ECS with XL Deploy.
 
 ## Step 1 - Configure AWS in XL Deploy
 
-Make sure you have setup the AWS command line interface installed and configured correctly as per [these instructions](https://docs.aws.amazon.com/cli/latest/userguide/tutorial-ec2-ubuntu.html#configure-cli).
+Make sure you have setup the AWS command line interface installed and configured correctly as per [these instructions](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html).
 
 
-This demo will not use the AWS command line interface itself, but will use the [credentials and configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html) in the `~/.aws/credentials` and `~/.aws/config` files:
+This demo will not use the AWS command line interface itself, but will use the [credentials and configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html) files:
+
+*Linux, macOS, or Unix*
+
+`~/.aws/credentials`
+
+`~/.aws/config`
+
+*Windows*
+
+`%UserProfile%\.aws\credentials`
+
+`%UserProfile%\.aws\config`
 
 
+### Generate XL YAML files
 Once you've configured the AWS command line interface, use the `awsconfig2xld.py` script in the `config` directory to create XL YAML files that will create the AWS environment in XL Deploy.
 
+*Linux and macOS*
 ```
- config/awsconfig2xld.py > /tmp/AWSConfig.yaml
+ config/awsconfig2xld.py > AWSConfig.yaml
+```
+*Windows*
+```
+ config\awsconfig2xld.py > AWSConfig.yaml
 ```
 
-Now send this file to XL Deploy using
-
+Now send this file to XL Deploy using:
 ```
- xl apply -f /tmp/AWSConfig.yaml
+ xl apply -f AWSConfig.yaml
 ```
 
 ## Step 2 - Import the REST-o-rant YAML definition:
@@ -130,27 +190,50 @@ We will be deploying the docker images of `rest-o-rant-web` and `rest-o-rant-api
 [https://github.com/xebialabs/rest-o-rant-api](https://github.com/xebialabs/rest-o-rant-api)
 
 
-Import the REST-o-rant ECS/Fargate cluster definition for AWS into XL Deploy:
+1) Import the REST-o-rant ECS/Fargate cluster definition for AWS into XL Deploy:
 
+*Linux and macOS*
 ```
  xl apply -f ecs/rest-o-rant-ecs-fargate-cluster.yaml
 ```
 
-Import the REST-o-rant application definition into XL Deploy:
+*Windows*
+```
+ xl apply -f ecs\rest-o-rant-ecs-fargate-cluster.yaml
+```
 
+2) Import the REST-o-rant application definition into XL Deploy:
+
+*Linux and macOS*
 ```
  xl apply -f ecs/rest-o-rant-ecs-service.yaml
 ```
+*Windows*
+```
+ xl apply -f ecs\rest-o-rant-ecs-service.yaml
+```
 
-Import the release pipeline into XL Release:
+3) Import the release pipeline into XL Release:
 
+*Linux and macOS*
 ```
  xl apply -f ecs/rest-o-rant-ecs-pipeline.yaml
 ```
-
+*Windows*
+```
+ xl apply -f ecs\rest-o-rant-ecs-pipeline.yaml
+```
 ## Step 3 - Start the release pipeline
 
-1. Go to the XL Release UI running on http://localhost:5516.
+1. Go to the XL Release GUI running on http://localhost:5516.
+
+*Windows (Optionally)*
+
+In case of Docker Toolbox installation, you need to refer to Docker machine IP instead of localhost. Get the Docker machine IP:
+```
+docker-machine ip
+```
+Now you are able to access XL Release GUI at http://docker-machine-ip:5516.
 
 2. Go to the "Templates" page under the "Design" tab.
 
