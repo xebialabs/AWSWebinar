@@ -46,7 +46,8 @@ cd master\AWSWebinar-master\modules\xebialabs\devops-as-code
 
 2) Start up the XL DevOps Platform:
 ```
- docker-compose up --build
+ docker-compose up --build -d
+ docker-compose logs -f
 ```
 
 3) Wait for XL Deploy and XL Release to have started up.
